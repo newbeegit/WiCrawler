@@ -117,7 +117,7 @@ public class WikiCrawler {
 				}
 
 			} catch (Exception e){
-
+				e.printStackTrace();
 			}
 		}
 
