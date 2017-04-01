@@ -129,12 +129,5 @@ public class WikiCrawler {
 		}
 		
 	}
-	/**
-	public static void main(String args[]){
-	// test extractLinks only
-		WikiCrawler a = new WikiCrawler("aaa", 100, "aaa");
-		a.extractLinks("C:/Users/sc922/workspace/Coms311PA2/src/sample.txt");
-	}
-	**/
 	
 }
