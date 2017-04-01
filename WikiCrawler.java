@@ -93,27 +93,28 @@ public class WikiCrawler {
 				}
 			}
 			try{
+				
 				URL url = new URL(BASE_URL + currentP);
 				InputStream is = url.openStream();
 				request++;
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        String address = null;
-        while(br.readLine()!=null){
-          address += br.readLine();
-        }
-        br.close();
+				BufferedReader br = new BufferedReader(new InputStreamReader(is));
+				String address = null;
+				while(br.readLine()!=null){
+				  address += br.readLine();
+				}
+				br.close();
 
-        extractedLinks = extractLinks(address);
-        for(String nextLink : extractedLinks){
-          if(!visited.contains(nextLink)&& !nextLink.equals(currentP)){
-            visited.add(nextLink);
-            output.append(currentP +" "+nextLink+'\n');
-          }
-          if(max>n){
-            n++;
-            q.add(nextLink);
-          }
-        }
+				extractedLinks = extractLinks(address);
+				for(String nextLink : extractedLinks){
+				  if(!visited.contains(nextLink)&& !nextLink.equals(currentP)){
+					visited.add(nextLink);
+					output.append(currentP +" "+nextLink+'\n');
+				  }
+				  if(max>n){
+					n++;
+					q.add(nextLink);
+				  }
+				}
 
 			} catch (Exception e){
 
