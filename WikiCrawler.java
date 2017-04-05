@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
@@ -40,6 +41,7 @@ public class WikiCrawler {
 	 */
 	public ArrayList<String> extractLinks(String doc){
 		ArrayList<String> result = new ArrayList<String>();
+		Hashtable<Integer, String> table = new Hashtable<Integer, String>();
 		try{
 			File f = new File(doc);
 			Scanner s = new Scanner(f);
@@ -56,7 +58,10 @@ public class WikiCrawler {
 						if(tmp.contains("href=\"/wiki/")){
 							String link = tmp.substring(tmp.indexOf("href=\"/")+6, tmp.length()-1);
 							System.out.println(link);
-							result.add(link);
+							if(!table.contains(link)){
+								table.put(link.hashCode(), link);
+								result.add(link);
+							}
 						}
 					}
 				}
@@ -74,7 +79,8 @@ public class WikiCrawler {
 	 */
 	public void crawl(){
 		int request = 0;
-		int n = 0;
+		int numLinks = 0;
+		int numEdges =0;
 		Queue<String> q = new LinkedList<String>();
 		ArrayList<String> visited = new ArrayList<String>();
 		ArrayList<String> extractedLinks;
@@ -87,7 +93,7 @@ public class WikiCrawler {
 			String currentP = (String)(q.remove());
 			if(request%100==0){
 				try {
-					wait(3);
+					Thread.sleep(3000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -98,23 +104,27 @@ public class WikiCrawler {
 				InputStream is = url.openStream();
 				request++;
 				BufferedReader br = new BufferedReader(new InputStreamReader(is));
-				String address = null;
+				PrintWriter tmp = new PrintWriter("tmp.txt");
 				while(br.readLine()!=null){
-				  address += br.readLine();
+				  tmp.println(br.readLine());
 				}
 				br.close();
 
-				extractedLinks = extractLinks(address);
+				numEdges++;
+				extractedLinks = extractLinks("tmp.txt");
 				for(String nextLink : extractedLinks){
 				  if(!visited.contains(nextLink)&& !nextLink.equals(currentP)){
 					visited.add(nextLink);
 					output.append(currentP +" "+nextLink+'\n');
-				  }
-				  if(max>n){
-					n++;
+					numLinks++;
 					q.add(nextLink);
 				  }
 				}
+				if(numEdges>=max){
+					q.clear();
+					break;
+				}
+				
 
 			} catch (Exception e){
 				e.printStackTrace();
@@ -122,8 +132,11 @@ public class WikiCrawler {
 		}
 
 		try {
+			StringBuilder output2 = new StringBuilder();
+			output2.append(numLinks +"\n");
+			output2.append(output);
 			PrintWriter solution= new PrintWriter(fileName);
-			solution.write(output.toString());
+			solution.write(output2.toString());
 			solution.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -131,4 +144,10 @@ public class WikiCrawler {
 
 	}
 
+	//test 
+	public static void main(String args[]){
+		WikiCrawler a = new WikiCrawler("/wiki/Complexity theory", 20, "C:/Users/sc922/workspace/Coms311PA2/src/result.txt");
+		//a.extractLinks("C:/Users/sc922/workspace/Coms311PA2/src/sample.txt");
+		a.crawl();
+	}
 }
